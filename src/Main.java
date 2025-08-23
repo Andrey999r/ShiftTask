@@ -68,8 +68,7 @@ public class Main {
         File outputDir = new File(outputPath);
         if (!outputDir.exists())// проверяем на корректность
         {
-            System.out.println("Создайте в корне папку для проанализированных файлов");
-            return;
+            outputDir.mkdir();
         }
 
         for (int i = 0; i < args.length; i++)// анализ args
