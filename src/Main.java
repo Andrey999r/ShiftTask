@@ -16,9 +16,9 @@ public class Main {
         // Дефолтные параметры и переменные
         boolean rewrite = true;
         boolean chooseFiles = false;
-        boolean wrongFile = false;
         boolean shortStat = false;
         boolean fullStat = false;
+        boolean emptyDir = false;
         String prefix = null;
         int quantityInt = 0;
         int quantityFLoat = 0;
@@ -73,7 +73,7 @@ public class Main {
 
         for (int i = 0; i < args.length; i++)// анализ args
         {
-            if (args[i].contains(".txt"))// если в args есть текстовый файл, знпчит пользователь выбрал определенные
+            if (args[i].contains(".txt"))// если в args есть текстовый файл, значит пользователь выбрал определенные
                                          // файлы для анализа
             {
                 filesToScan.add(args[i]);
@@ -130,7 +130,7 @@ public class Main {
                 for (File deleted : outputDir.listFiles()) {
                     scannerForDelete = new Scanner(deleted);
                     while (scannerForDelete.hasNext()) {
-                        if (scannerForDelete.hasNextInt()) {
+                        if (scannerForDelete.hasNextLong()) {
                             long smth = scannerForDelete.nextLong();
                             writerToAnotherFile.write(smth + "\n");
                         } else {
@@ -138,10 +138,12 @@ public class Main {
                             writerToAnotherFile.write(smth + "\n");
                         }
                     }
-                    scannerForDelete.close();
                     deleted.delete();
                 }
+                scannerForDelete.close();
                 writerToAnotherFile.close();
+            } else {
+                emptyDir = true;
             }
             intwriter = new FileWriter(intfile, true);
             flwriter = new FileWriter(flfile, true);
@@ -151,19 +153,20 @@ public class Main {
         for (File inputFIle : inputDir.listFiles()) // Запись в файлы
         {
             if (chooseFiles) {
+                boolean found = false;
                 for (String scan : filesToScan) {
-                    if (inputFIle.getName() != scan) {
-                        wrongFile = true;
+                    if (inputFIle.getName().equals(scan)) {
+                        found = true; // нашли совпадение
                         break;
                     }
                 }
-                if (wrongFile) {
+                if (!found) { // если не нашли ни одного совпадения
                     continue;
                 }
             }
             scanner = new Scanner(inputFIle);
             while (scanner.hasNext()) {
-                if (scanner.hasNextInt()) {
+                if (scanner.hasNextLong()) {
                     long val = scanner.nextLong();
                     intwriter.write(val + "\n");
                 } else {
@@ -195,7 +198,7 @@ public class Main {
         if (strfile.length() == 0) {
             strfile.delete();
         }
-        if (!rewrite) {
+        if (!rewrite & !emptyDir) {
             anotherFile.delete();
         }
         if (shortStat | fullStat)// Краткая или полная статистика
